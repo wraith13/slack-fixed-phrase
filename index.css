@@ -1,0 +1,23 @@
+* {
+  font-family: "MS Gothic";
+  color: #000022;
+}
+body {
+  margin: 1rem;
+}
+h1 {
+  margin: -1rem;
+  margin-bottom: 0em;
+  padding: 1rem;
+  color: #FFFFFF;
+  background-color: #000022;
+}
+.github {
+  float: right;
+  margin-top: 1rem;
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  color: #FFFFFF;
+  background-color: #000022;
+}
