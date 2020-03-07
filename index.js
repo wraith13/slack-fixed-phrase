@@ -37,6 +37,25 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var minamo_js_1 = require("./minamo.js");
+var Slack;
+(function (Slack) {
+    var _this = this;
+    Slack.authorize = function (application, user_scope, redirect_uri) {
+        return location.href = "https://slack.com/oauth/v2/authorize?client_id=" + application.client_id + "&user_scope=" + user_scope.join(",") + "&redirect_uri=" + redirect_uri;
+    };
+    Slack.oauthV2Access = function (application, code, redirect_uri) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+        return [2 /*return*/, minamo_js_1.minamo.http.get("https://slack.com/api/oauth.v2.access?client_id=" + application.client_id + "&client_secret=" + application.client_secret + "&code=" + code + "&redirect_uri=" + redirect_uri)];
+    }); }); };
+    Slack.teamInfo = function (token) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+        return [2 /*return*/, minamo_js_1.minamo.http.get("https://slack.com/api/team.info?token=" + token)];
+    }); }); };
+    Slack.channelsList = function (token) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+        return [2 /*return*/, minamo_js_1.minamo.http.get("https://slack.com/api/channels.list?token=" + token)];
+    }); }); };
+    Slack.emojiList = function (token, limit) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+        return [2 /*return*/, minamo_js_1.minamo.http.get("https://slack.com/api/emoji.list?token=" + token + "&limit=" + limit)];
+    }); }); };
+})(Slack = exports.Slack || (exports.Slack = {}));
 var SlackFixedPhrase;
 (function (SlackFixedPhrase) {
     var _this = this;
