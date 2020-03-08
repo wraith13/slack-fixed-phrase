@@ -42,6 +42,15 @@ export module minamo
                     recursiveAssign(target[key], value);
                 }
                 else
+                if ("array" === practicalTypeof(value))
+                {
+                    if (undefined === target[key])
+                    {
+                        target[key] = [ ];
+                    }
+                    recursiveAssign(target[key], value);
+                }
+                else
                 {
                     target[key] = value;
                 }
@@ -638,11 +647,15 @@ export module minamo
 
     export module http
     {
-        export const request = (method: string, url: string, body?: Document | BodyInit | null): Promise<string> => new Promise<string>
+        export const request = (method: string, url: string, body?: Document | BodyInit | null, headers?: { [key: string]: string}): Promise<string> => new Promise<string>
         (
             (resolve, reject) =>
             {
                 const request = new XMLHttpRequest();
+                if (headers)
+                {
+                    Object.keys(headers).map(key => request.setRequestHeader(key, headers[key]));
+                }
                 request.open(method, url, true);
                 request.onreadystatechange = function()
                 {
@@ -668,8 +681,10 @@ export module minamo
             }
         );
 
-        export const get = (url : string): Promise<string> => request("GET", url);
-        export const post = (url : string, body?: Document | BodyInit | null): Promise<string> => request("POST", url, body);
+        export const get = (url : string, headers?: { [key: string]: string}): Promise<string> => request("GET", url, undefined, headers);
+        export const post = (url : string, body?: Document | BodyInit | null, headers?: { [key: string]: string}): Promise<string> => request("POST", url, body, headers);
+        export const getJson = async <T>(url : string, headers?: { [key: string]: string}): Promise<T> => <T>JSON.parse(await get(url, headers));
+        export const postJson = async <T>(url : string, body?: Document | BodyInit | null, headers?: { [key: string]: string}): Promise<T> => <T>JSON.parse(await post(url, body, headers));
     }
     
     export module file
