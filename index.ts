@@ -7,9 +7,11 @@ export module Slack
         client_id: string;
         client_secret: string;
     }
+    type AppId = string;
     type UserId = string;
     type TeamId = string;
     type ChannelId = string;
+    type AccessToken = string;
     type UnixTime = number;
     export interface User
     {
@@ -89,35 +91,50 @@ export module Slack
         user_scope: string[],
         redirect_uri: string
     ) =>
-        location.href = `https://slack.com/oauth/v2/authorize?client_id=${application.client_id}&user_scope=${user_scope.join(",")}&redirect_uri=${redirect_uri}`;
+        location.href = `https://slack.com/oauth/v2/authorize?client_id=${ application.client_id }&user_scope=${ user_scope.join ( "," ) }&redirect_uri=${ redirect_uri }`;
     export const oauthV2Access =
         async (
             application: Application,
             code: string,
             redirect_uri: string
-        ) =>
-        minamo.http.get(`https://slack.com/api/oauth.v2.access?client_id=${application.client_id}&client_secret=${application.client_secret}&code=${code}&redirect_uri=${redirect_uri}`);
-    export const teamInfo = async (token: string) => minamo.http.get(`https://slack.com/api/team.info?token=${token}`);
-    export const channelsList = async (token: string) => minamo.http.get(`https://slack.com/api/channels.list?token=${token}`);
-    export const emojiList = async (token: string, limit: string) => minamo.http.get(`https://slack.com/api/emoji.list?token=${token}&limit=${limit}`);
+        ):
+        Promise<{
+            ok: boolean,
+            app_id: AppId,
+            authed_user:
+            {
+                id: UserId,
+                scope: string,
+                access_token: AccessToken,
+                token_type: string,
+            },
+            team:
+            {
+                id: TeamId,
+                name: string,
+            },
+            enterprise: unknown,
+        }> =>
+        minamo.http.getJson ( `https://slack.com/api/oauth.v2.access?client_id=${ application.client_id }&client_secret=${ application.client_secret }&code=${ code }&redirect_uri=${ redirect_uri }` );
+    export const teamInfo = async ( token: AccessToken ) => minamo.http.get ( `https://slack.com/api/team.info?token=${ token }` );
+    export const channelsList = async ( token: AccessToken ) => minamo.http.get ( `https://slack.com/api/channels.list?token=${ token }`);
+    export const emojiList = async ( token: AccessToken, limit: string ) => minamo.http.get ( `https://slack.com/api/emoji.list?token=${ token }&limit=${ limit }` );
 }
 
 export module SlackFixedPhrase
 {
-    const makeHeading = (tag: string, text: string) =>
-    (
-        {
-            tag,
-            children: text,
-        }
-    );
-    export const start = async (): Promise<void> =>
+    const makeHeading = ( tag: string, text: string ) =>
+    ({
+        tag,
+        children: text,
+    });
+    export const start = async ( ): Promise<void> =>
     {
         minamo.dom.appendChildren
         (
             document.body,
             [
-                makeHeading("h1", document.title),
+                makeHeading ( "h1", document.title ),
                 {
                     tag: "a",
                     className: "github",
