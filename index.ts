@@ -116,8 +116,10 @@ export module Slack
             enterprise: unknown,
         }> =>
         minamo.http.getJson ( `https://slack.com/api/oauth.v2.access?client_id=${ application.client_id }&client_secret=${ application.client_secret }&code=${ code }&redirect_uri=${ redirect_uri }` );
-    export const teamInfo = async ( token: AccessToken ) => minamo.http.get ( `https://slack.com/api/team.info?token=${ token }` );
-    export const channelsList = async ( token: AccessToken ) => minamo.http.get ( `https://slack.com/api/channels.list?token=${ token }`);
+    export const teamInfo = async ( token: AccessToken ): Promise<{ ok: boolean, team: Team }> =>
+        minamo.http.getJson ( `https://slack.com/api/team.info?token=${ token }` );
+    export const channelsList = async ( token: AccessToken ): Promise<{ ok: boolean, channels: Channel[] }> =>
+        minamo.http.getJson ( `https://slack.com/api/channels.list?token=${ token }`);
     export const emojiList = async ( token: AccessToken, limit: string ) => minamo.http.get ( `https://slack.com/api/emoji.list?token=${ token }&limit=${ limit }` );
 }
 
