@@ -7,14 +7,14 @@ export module Slack
         client_id: string;
         client_secret: string;
     }
-    type AppId = string;
-    type UserId = string;
-    type TeamId = string;
-    type ChannelId = string;
-    type BotId = string;
-    type AccessToken = string;
-    type UnixTime = number;
-    export interface User
+    export type AppId = string;
+    export type UserId = string;
+    export type TeamId = string;
+    export type ChannelId = string;
+    export type BotId = string;
+    export type AccessToken = string;
+    export type UnixTime = number;
+    export interface AuthedUser
     {
         id: UserId;
         scope: string;
@@ -131,13 +131,7 @@ export module Slack
         Promise<{
             ok: boolean,
             app_id: AppId,
-            authed_user:
-            {
-                id: UserId,
-                scope: string,
-                access_token: AccessToken,
-                token_type: string,
-            },
+            authed_user: AuthedUser,
             team:
             {
                 id: TeamId,
@@ -215,6 +209,72 @@ export module SlackFixedPhrase
     {
         name: string;
     }
+
+    export interface Identity
+    {
+        user: Slack.User;
+        team: Slack.Team;
+        token: Slack.AccessToken;
+    }
+
+    export interface HistoryItem
+    {
+        user: Slack.UserId;
+        api: string;
+        data: unknown;
+    }
+    const getIdentityList = (): Identity[] =>
+    {
+
+    };
+    const getIdentity = (id: Slack.UserId): Identity => getIdentityList().filter(i => i.user.id === id)[0];
+
+    const renderUser = (user: Slack.User) =>
+    {
+
+    };
+    const renderTeam = (team: Slack.Team) =>
+    {
+
+    };
+    const renderIdentity = (identity: Identity)=>
+    {
+
+    };
+    const renderItem = (item: HistoryItem)=>
+    {
+        switch(item.api)
+        {
+        case "chatPostMessage":
+            return;
+        case "usersProfileSet":
+            return;
+        }
+        return;
+    };
+    const renderEdit = (item: HistoryItem)=>
+    {
+        switch(item.api)
+        {
+        case "chatPostMessage":
+            return;
+        case "usersProfileSet":
+            return;
+        }
+        return;
+    };
+    const execute = async (item: HistoryItem) =>
+    {
+        const token = getIdentity(item.user).token;
+        switch(item.api)
+        {
+        case "chatPostMessage":
+            return await Slack.chatPostMessage(token, <any>item.data);
+        case "usersProfileSet":
+            return await Slack.usersProfileSet(token, <any>item.data);
+        }
+        return null;
+    };
 
     const makeHeading = ( tag: string, text: string ) =>
     ({
