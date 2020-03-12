@@ -92,6 +92,28 @@ export module Slack
         email: string;
         team: TeamId;
     }
+    export interface User
+    {
+        id: UserId;
+        team_id: TeamId;
+        name: string;
+        deleted: boolean;
+        color: string;
+        real_name: string;
+        tz: string;
+        tz_label: string;
+        tz_offset: number;
+        profile: Profile;
+        is_admin: boolean;
+        is_owner: boolean;
+        is_primary_owner: boolean;
+        is_restricted: boolean;
+        is_ultra_restricted: boolean;
+        is_bot: boolean;
+        is_app_user: boolean;
+        updated: UnixTime;
+        has_2fa: boolean;
+    }
 
     export const authorize =
     (
@@ -124,6 +146,8 @@ export module Slack
             enterprise: unknown,
         }> =>
         minamo.http.getJson ( `https://slack.com/api/oauth.v2.access?client_id=${ application.client_id }&client_secret=${ application.client_secret }&code=${ code }&redirect_uri=${ redirect_uri }` );
+    export const usersInfo = async ( token: AccessToken, user: UserId ): Promise<{ ok: boolean, user: User }> =>
+    minamo.http.getJson ( `https://slack.com/api/users.info?token=${ token }&user=${ user }` );
     export const teamInfo = async ( token: AccessToken ): Promise<{ ok: boolean, team: Team }> =>
         minamo.http.getJson ( `https://slack.com/api/team.info?token=${ token }` );
     export const channelsList = async ( token: AccessToken ): Promise<{ ok: boolean, channels: Channel[] }> =>
@@ -187,6 +211,11 @@ export module Slack
 
 export module SlackFixedPhrase
 {
+    export interface Application extends Slack.Application
+    {
+        name: string;
+    }
+
     const makeHeading = ( tag: string, text: string ) =>
     ({
         tag,
