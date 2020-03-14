@@ -223,10 +223,12 @@ export module SlackFixedPhrase
         api: string;
         data: unknown;
     }
-    const getIdentityList = (): Identity[] =>
-    {
 
-    };
+    const getIdentityList = (): Identity[] => minamo.localStorage.getOrNull<Identity[]>("identities") ?? [];
+    const setIdentityList = (list: Identity[]) => minamo.localStorage.set("identities", list);
+    const getHistory = (): HistoryItem[] => minamo.localStorage.getOrNull<HistoryItem[]>("history") ?? [];
+    const setHistory = (list: HistoryItem[]) => minamo.localStorage.set("history", list);
+
     const getIdentity = (id: Slack.UserId): Identity => getIdentityList().filter(i => i.user.id === id)[0];
 
     const renderUser = (user: Slack.User) =>
@@ -294,6 +296,11 @@ export module SlackFixedPhrase
                     children: "GitHub",
                     href: "https://github.com/wraith13/slac-fixed-phrase"
                 },
+                {
+                    tag: "button",
+                    children: "追加",
+                },
+                getHistory().map(renderItem),
             ]
         );
     };
