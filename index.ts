@@ -226,8 +226,8 @@ export module SlackFixedPhrase
 
     const getIdentityList = (): Identity[] => minamo.localStorage.getOrNull<Identity[]>("identities") ?? [];
     const setIdentityList = (list: Identity[]) => minamo.localStorage.set("identities", list);
-    const getHistory = (): HistoryItem[] => minamo.localStorage.getOrNull<HistoryItem[]>("history") ?? [];
-    const setHistory = (list: HistoryItem[]) => minamo.localStorage.set("history", list);
+    const getHistory = (user: Slack.UserId): HistoryItem[] => minamo.localStorage.getOrNull<HistoryItem[]>(`user:${user}.history`) ?? [];
+    const setHistory = (user: Slack.UserId, list: HistoryItem[]) => minamo.localStorage.set(`user:${user}.history`, list);
 
     const getIdentity = (id: Slack.UserId): Identity => getIdentityList().filter(i => i.user.id === id)[0];
 
@@ -290,7 +290,7 @@ export module SlackFixedPhrase
         return null;
     };
 
-    const makeHeading = ( tag: string, text: string ) =>
+    const makeHeading = ( tag: string, text: minamo.dom.Source ) =>
     ({
         tag,
         children: text,
@@ -308,11 +308,22 @@ export module SlackFixedPhrase
                     children: "GitHub",
                     href: "https://github.com/wraith13/slac-fixed-phrase"
                 },
+                getIdentityList().map
+                (
+                    i =>
+                    [
+                        makeHeading ( "h2", `${i.team.name} / ${i.user.name}` ),
+                        makeHeading ( "h3", "Post Message" ),
+                        makeHeading ( "h3", "Set Status" ),
+                        makeHeading ( "h3", "History" ),
+                        getHistory(i.user.id).map(renderItem),
+                    ],
+                ),
+                makeHeading ( "h2", `Register Identity` ),
                 {
                     tag: "button",
                     children: "追加",
                 },
-                getHistory().map(renderItem),
             ]
         );
     };
