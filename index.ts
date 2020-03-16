@@ -240,20 +240,32 @@ export module SlackFixedPhrase
 
     };
     const renderIdentity = (identity: Identity)=>
-    {
-
-    };
-    const renderItem = (item: HistoryItem)=>
+    ({
+        tag: "div",
+        className: ""
+    });
+    const renderItemCore = (item: HistoryItem)=>
     {
         switch(item.api)
         {
         case "chatPostMessage":
-            return;
+            return JSON.stringify(item);
         case "usersProfileSet":
-            return;
+            return JSON.stringify(item);
         }
-        return;
+        return JSON.stringify(item);
     };
+    const renderItem = (item: HistoryItem)=>
+    ({
+        tag: "div",
+        className: "item",
+        children:
+        [
+            renderIdentity(getIdentity(item.user)),
+            renderItemCore(item),
+        ],
+        onclick: () => execute(item),
+    });
     const renderEdit = (item: HistoryItem)=>
     {
         switch(item.api)
