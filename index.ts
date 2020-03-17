@@ -224,6 +224,8 @@ export module SlackFixedPhrase
         data: unknown;
     }
 
+    const getApplicationList = (): Application[] => minamo.localStorage.getOrNull<IdeApplicationntity[]>("application") ?? [];
+    const setApplicationist = (list: Application[]) => minamo.localStorage.set("application", list);
     const getIdentityList = (): Identity[] => minamo.localStorage.getOrNull<Identity[]>("identities") ?? [];
     const setIdentityList = (list: Identity[]) => minamo.localStorage.set("identities", list);
     const getHistory = (user: Slack.UserId): HistoryItem[] => minamo.localStorage.getOrNull<HistoryItem[]>(`user:${user}.history`) ?? [];
@@ -242,7 +244,12 @@ export module SlackFixedPhrase
     const renderIdentity = (identity: Identity)=>
     ({
         tag: "div",
-        className: ""
+        className: "identity",
+        children:
+        [
+            renderTeam(identity.team),
+            renderUser(identity.user),
+        ]
     });
     const renderItemCore = (item: HistoryItem)=>
     {
@@ -266,17 +273,6 @@ export module SlackFixedPhrase
         ],
         onclick: () => execute(item),
     });
-    const renderEdit = (item: HistoryItem)=>
-    {
-        switch(item.api)
-        {
-        case "chatPostMessage":
-            return;
-        case "usersProfileSet":
-            return;
-        }
-        return;
-    };
     const execute = async (item: HistoryItem) =>
     {
         const token = getIdentity(item.user).token;
@@ -319,11 +315,62 @@ export module SlackFixedPhrase
                         getHistory(i.user.id).map(renderItem),
                     ],
                 ),
-                makeHeading ( "h2", `Register Identity` ),
+                makeHeading ( "h2", `Register User` ),
+                getApplicationList().map
+                (
+                    i =>
+                    [
+                        {
+                            tag: "button",
+                            children: `OAuth by ${i.name} API Key`,
+                        },
+                    ],
+                ),
+                makeHeading ( "h2", `Register API Key` ),
                 {
-                    tag: "button",
-                    children: "追加",
-                },
+                    tag: "div",
+                    className: "identity-from",
+                    children:
+                    [
+                        {
+                            tag: "label",
+                            children:
+                            [
+                                "name",
+                                {
+                                    tag: "input",
+                                    className: "identity-name",
+                                }
+                            ]
+                        },
+                        {
+                            tag: "label",
+                            children:
+                            [
+                                "client_id",
+                                {
+                                    tag: "input",
+                                    className: "identity-client-id",
+                                }
+                            ]
+                        },
+                        {
+                            tag: "label",
+                            children:
+                            [
+                                "client_secret",
+                                {
+                                    tag: "input",
+                                    className: "identity-client-secret",
+                                }
+                            ]
+                        },
+                        {
+                            tag: "button",
+                            children: "追加",
+                        },
+                    ]
+                }
             ]
         );
     };
