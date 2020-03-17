@@ -224,7 +224,7 @@ export module SlackFixedPhrase
         data: unknown;
     }
 
-    const getApplicationList = (): Application[] => minamo.localStorage.getOrNull<IdeApplicationntity[]>("application") ?? [];
+    const getApplicationList = (): Application[] => minamo.localStorage.getOrNull<Application[]>("application") ?? [];
     const setApplicationist = (list: Application[]) => minamo.localStorage.set("application", list);
     const getIdentityList = (): Identity[] => minamo.localStorage.getOrNull<Identity[]>("identities") ?? [];
     const setIdentityList = (list: Identity[]) => minamo.localStorage.set("identities", list);
@@ -233,46 +233,88 @@ export module SlackFixedPhrase
 
     const getIdentity = (id: Slack.UserId): Identity => getIdentityList().filter(i => i.user.id === id)[0];
 
-    const renderUser = (user: Slack.User) =>
+    export module dom
     {
+        export const makeHeading = ( tag: string, text: minamo.dom.Source ) =>
+        ({
+            tag,
+            children: text,
+        });
 
-    };
-    const renderTeam = (team: Slack.Team) =>
-    {
-
-    };
-    const renderIdentity = (identity: Identity)=>
-    ({
-        tag: "div",
-        className: "identity",
-        children:
-        [
-            renderTeam(identity.team),
-            renderUser(identity.user),
-        ]
-    });
-    const renderItemCore = (item: HistoryItem)=>
-    {
-        switch(item.api)
+        export const renderUser = (user: Slack.User) =>
         {
-        case "chatPostMessage":
+    
+        };
+        export const renderTeam = (team: Slack.Team) =>
+        {
+    
+        };
+        export const renderIdentity = (identity: Identity)=>
+        ({
+            tag: "div",
+            className: "identity",
+            children:
+            [
+                renderTeam(identity.team),
+                renderUser(identity.user),
+            ]
+        });
+        export const renderItemCore = (item: HistoryItem)=>
+        {
+            switch(item.api)
+            {
+            case "chatPostMessage":
+                return JSON.stringify(item);
+            case "usersProfileSet":
+                return JSON.stringify(item);
+            }
             return JSON.stringify(item);
-        case "usersProfileSet":
-            return JSON.stringify(item);
-        }
-        return JSON.stringify(item);
-    };
-    const renderItem = (item: HistoryItem)=>
-    ({
-        tag: "div",
-        className: "item",
-        children:
-        [
-            renderIdentity(getIdentity(item.user)),
-            renderItemCore(item),
-        ],
-        onclick: () => execute(item),
-    });
+        };
+        export const renderItem = (item: HistoryItem)=>
+        ({
+            tag: "div",
+            className: "item",
+            children:
+            [
+                renderIdentity(getIdentity(item.user)),
+                renderItemCore(item),
+            ],
+            onclick: () => execute(item),
+        });
+
+        const identityList = minamo.dom.make(HTMLDivElement)({ });
+        export const updateIdentityList = () => minamo.dom.replaceChildren
+        (
+            identityList,
+            getIdentityList().map
+            (
+                i =>
+                [
+                    makeHeading ( "h2", `${i.team.name} / ${i.user.name}` ),
+                    makeHeading ( "h3", "Post Message" ),
+                    makeHeading ( "h3", "Set Status" ),
+                    makeHeading ( "h3", "History" ),
+                    getHistory(i.user.id).map(renderItem),
+                ],
+            )
+        );
+        const applicationList = minamo.dom.make(HTMLDivElement)({ });
+        export const updateApplicationList = () => minamo.dom.replaceChildren
+        (
+            applicationList,
+            getApplicationList().map
+            (
+                i =>
+                [
+                    {
+                        tag: "button",
+                        children: `OAuth by ${i.name} API Key`,
+                    },
+                ],
+            )
+        );
+    }
+
     const execute = async (item: HistoryItem) =>
     {
         const token = getIdentity(item.user).token;
@@ -286,47 +328,23 @@ export module SlackFixedPhrase
         return null;
     };
 
-    const makeHeading = ( tag: string, text: minamo.dom.Source ) =>
-    ({
-        tag,
-        children: text,
-    });
     export const start = async ( ): Promise<void> =>
     {
         minamo.dom.appendChildren
         (
             document.body,
             [
-                makeHeading ( "h1", document.title ),
+                dom.makeHeading ( "h1", document.title ),
                 {
                     tag: "a",
                     className: "github",
                     children: "GitHub",
                     href: "https://github.com/wraith13/slac-fixed-phrase"
                 },
-                getIdentityList().map
-                (
-                    i =>
-                    [
-                        makeHeading ( "h2", `${i.team.name} / ${i.user.name}` ),
-                        makeHeading ( "h3", "Post Message" ),
-                        makeHeading ( "h3", "Set Status" ),
-                        makeHeading ( "h3", "History" ),
-                        getHistory(i.user.id).map(renderItem),
-                    ],
-                ),
-                makeHeading ( "h2", `Register User` ),
-                getApplicationList().map
-                (
-                    i =>
-                    [
-                        {
-                            tag: "button",
-                            children: `OAuth by ${i.name} API Key`,
-                        },
-                    ],
-                ),
-                makeHeading ( "h2", `Register API Key` ),
+                dom.updateIdentityList(),
+                dom.makeHeading ( "h2", `Register User` ),
+                dom.updateApplicationList(),
+                dom.makeHeading ( "h2", `Register API Key` ),
                 {
                     tag: "div",
                     className: "identity-from",
