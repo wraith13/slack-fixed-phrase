@@ -235,21 +235,21 @@ export module SlackFixedPhrase
 
     export module dom
     {
-        export const makeHeading = ( tag: string, text: minamo.dom.Source ) =>
+        const makeHeading = ( tag: string, text: minamo.dom.Source ) =>
         ({
             tag,
             children: text,
         });
 
-        export const renderUser = (user: Slack.User) =>
+        const renderUser = (user: Slack.User) =>
         {
     
         };
-        export const renderTeam = (team: Slack.Team) =>
+        const renderTeam = (team: Slack.Team) =>
         {
     
         };
-        export const renderIdentity = (identity: Identity)=>
+        const renderIdentity = (identity: Identity)=>
         ({
             tag: "div",
             className: "identity",
@@ -259,7 +259,7 @@ export module SlackFixedPhrase
                 renderUser(identity.user),
             ]
         });
-        export const renderItemCore = (item: HistoryItem)=>
+        const renderItemCore = (item: HistoryItem)=>
         {
             switch(item.api)
             {
@@ -270,7 +270,7 @@ export module SlackFixedPhrase
             }
             return JSON.stringify(item);
         };
-        export const renderItem = (item: HistoryItem)=>
+        const renderItem = (item: HistoryItem)=>
         ({
             tag: "div",
             className: "item",
@@ -283,7 +283,7 @@ export module SlackFixedPhrase
         });
 
         const identityList = minamo.dom.make(HTMLDivElement)({ });
-        export const updateIdentityList = () => minamo.dom.replaceChildren
+        const updateIdentityList = () => minamo.dom.replaceChildren
         (
             identityList,
             getIdentityList().map
@@ -313,6 +313,70 @@ export module SlackFixedPhrase
                 ],
             )
         );
+        const applicationName = minamo.dom.make(HTMLInputElement)
+        ({
+            tag: "input",
+            className: "application-name",
+        });
+        const applicationClientId = minamo.dom.make(HTMLInputElement)
+        ({
+            tag: "input",
+            className: "application-client-id",
+        });
+        const applicationClientSecret = minamo.dom.make(HTMLInputElement)
+        ({
+            tag: "input",
+            className: "application-client-secret",
+        });
+        const applicationForm = minamo.dom.make(HTMLDivElement)
+        ({
+            tag: "div",
+            className: "application-form",
+            children:
+            [
+                {
+                    tag: "label",
+                    children: [ "name", applicationName, ],
+                },
+                {
+                    tag: "label",
+                    children: [ "client_id", applicationClientId, ],
+                },
+                {
+                    tag: "label",
+                    children: [ "client_secret", applicationClientSecret ],
+                },
+                {
+                    tag: "button",
+                    children: "追加",
+                    onclick: () =>
+                    {
+                        
+                    }
+                },
+            ]
+        });
+        const screen =
+        [
+            makeHeading ( "h1", document.title ),
+            {
+                tag: "a",
+                className: "github",
+                children: "GitHub",
+                href: "https://github.com/wraith13/slac-fixed-phrase"
+            },
+            updateIdentityList(),
+            makeHeading ( "h2", `Register User` ),
+            updateApplicationList(),
+            makeHeading ( "h2", `Register API Key` ),
+            applicationForm,
+        ];
+
+        export const showScreen = async ( ) => minamo.dom.appendChildren
+        (
+            document.body,
+            screen
+        );
     }
 
     const execute = async (item: HistoryItem) =>
@@ -328,68 +392,5 @@ export module SlackFixedPhrase
         return null;
     };
 
-    export const start = async ( ): Promise<void> =>
-    {
-        minamo.dom.appendChildren
-        (
-            document.body,
-            [
-                dom.makeHeading ( "h1", document.title ),
-                {
-                    tag: "a",
-                    className: "github",
-                    children: "GitHub",
-                    href: "https://github.com/wraith13/slac-fixed-phrase"
-                },
-                dom.updateIdentityList(),
-                dom.makeHeading ( "h2", `Register User` ),
-                dom.updateApplicationList(),
-                dom.makeHeading ( "h2", `Register API Key` ),
-                {
-                    tag: "div",
-                    className: "identity-from",
-                    children:
-                    [
-                        {
-                            tag: "label",
-                            children:
-                            [
-                                "name",
-                                {
-                                    tag: "input",
-                                    className: "identity-name",
-                                }
-                            ]
-                        },
-                        {
-                            tag: "label",
-                            children:
-                            [
-                                "client_id",
-                                {
-                                    tag: "input",
-                                    className: "identity-client-id",
-                                }
-                            ]
-                        },
-                        {
-                            tag: "label",
-                            children:
-                            [
-                                "client_secret",
-                                {
-                                    tag: "input",
-                                    className: "identity-client-secret",
-                                }
-                            ]
-                        },
-                        {
-                            tag: "button",
-                            children: "追加",
-                        },
-                    ]
-                }
-            ]
-        );
-    };
+    export const start = async ( ) => await dom.showScreen();
 }
