@@ -233,9 +233,22 @@ export module SlackFixedPhrase
 
     const getIdentity = (id: Slack.UserId): Identity => getIdentityList().filter(i => i.user.id === id)[0];
 
+    const execute = async (item: HistoryItem) =>
+    {
+        const token = getIdentity(item.user).token;
+        switch(item.api)
+        {
+        case "chatPostMessage":
+            return await Slack.chatPostMessage(token, <any>item.data);
+        case "usersProfileSet":
+            return await Slack.usersProfileSet(token, <any>item.data);
+        }
+        return null;
+    };
+
     export module dom
     {
-        const makeHeading = ( tag: string, text: minamo.dom.Source ) =>
+        const renderHeading = ( tag: string, text: minamo.dom.Source ) =>
         ({
             tag,
             children: text,
@@ -290,10 +303,10 @@ export module SlackFixedPhrase
             (
                 i =>
                 [
-                    makeHeading ( "h2", `${i.team.name} / ${i.user.name}` ),
-                    makeHeading ( "h3", "Post Message" ),
-                    makeHeading ( "h3", "Set Status" ),
-                    makeHeading ( "h3", "History" ),
+                    renderHeading ( "h2", `${i.team.name} / ${i.user.name}` ),
+                    renderHeading ( "h3", "Post Message" ),
+                    renderHeading ( "h3", "Set Status" ),
+                    renderHeading ( "h3", "History" ),
                     getHistory(i.user.id).map(renderItem),
                 ],
             )
@@ -358,7 +371,7 @@ export module SlackFixedPhrase
         });
         const screen =
         [
-            makeHeading ( "h1", document.title ),
+            renderHeading ( "h1", document.title ),
             {
                 tag: "a",
                 className: "github",
@@ -366,9 +379,9 @@ export module SlackFixedPhrase
                 href: "https://github.com/wraith13/slac-fixed-phrase"
             },
             updateIdentityList(),
-            makeHeading ( "h2", `Register User` ),
+            renderHeading ( "h2", `Register User` ),
             updateApplicationList(),
-            makeHeading ( "h2", `Register API Key` ),
+            renderHeading ( "h2", `Register API Key` ),
             applicationForm,
         ];
 
@@ -378,19 +391,6 @@ export module SlackFixedPhrase
             screen
         );
     }
-
-    const execute = async (item: HistoryItem) =>
-    {
-        const token = getIdentity(item.user).token;
-        switch(item.api)
-        {
-        case "chatPostMessage":
-            return await Slack.chatPostMessage(token, <any>item.data);
-        case "usersProfileSet":
-            return await Slack.usersProfileSet(token, <any>item.data);
-        }
-        return null;
-    };
 
     export const start = async ( ) => await dom.showScreen();
 }
