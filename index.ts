@@ -1,5 +1,4 @@
 import { minamo } from "./minamo.js";
-
 export module Slack
 {
     export interface Application
@@ -223,16 +222,43 @@ export module SlackFixedPhrase
         api: string;
         data: unknown;
     }
-
     const getApplicationList = (): Application[] => minamo.localStorage.getOrNull<Application[]>("application") ?? [];
     const setApplicationist = (list: Application[]) => minamo.localStorage.set("application", list);
+    const addApplication = (item: Application) => setApplicationist
+    (
+        [item].concat
+        (
+            getApplicationList()
+                .filter(i => i.client_id !== item.client_id)
+        )
+    );
     const getIdentityList = (): Identity[] => minamo.localStorage.getOrNull<Identity[]>("identities") ?? [];
     const setIdentityList = (list: Identity[]) => minamo.localStorage.set("identities", list);
+    const addIdentity = (item: Identity) => setIdentityList
+    (
+        [item].concat
+        (
+            getIdentityList()
+                .filter
+                (
+                    i =>
+                        i.user.id !== item.user.id ||
+                        i.team.id !== item.team.id
+                )
+        )
+    );
     const getHistory = (user: Slack.UserId): HistoryItem[] => minamo.localStorage.getOrNull<HistoryItem[]>(`user:${user}.history`) ?? [];
     const setHistory = (user: Slack.UserId, list: HistoryItem[]) => minamo.localStorage.set(`user:${user}.history`, list);
-
+    const addHistory = (item: HistoryItem) => setHistory
+    (
+        item.user,
+        [item].concat
+        (
+            getHistory(item.user)
+                .filter(i => JSON.stringify(i) !== JSON.stringify(item))
+        )
+    );
     const getIdentity = (id: Slack.UserId): Identity => getIdentityList().filter(i => i.user.id === id)[0];
-
     const execute = async (item: HistoryItem) =>
     {
         const token = getIdentity(item.user).token;
@@ -243,9 +269,9 @@ export module SlackFixedPhrase
         case "usersProfileSet":
             return await Slack.usersProfileSet(token, <any>item.data);
         }
+        addHistory(item);
         return null;
     };
-
     export module dom
     {
         const renderHeading = ( tag: string, text: minamo.dom.Source ) =>
@@ -253,7 +279,6 @@ export module SlackFixedPhrase
             tag,
             children: text,
         });
-
         const renderUser = (user: Slack.User) =>
         {
     
@@ -294,7 +319,6 @@ export module SlackFixedPhrase
             ],
             onclick: () => execute(item),
         });
-
         const identityList = minamo.dom.make(HTMLDivElement)({ });
         const updateIdentityList = () => minamo.dom.replaceChildren
         (
@@ -384,13 +408,11 @@ export module SlackFixedPhrase
             renderHeading ( "h2", `Register API Key` ),
             applicationForm,
         ];
-
         export const showScreen = async ( ) => minamo.dom.appendChildren
         (
             document.body,
             screen
         );
     }
-
     export const start = async ( ) => await dom.showScreen();
 }
