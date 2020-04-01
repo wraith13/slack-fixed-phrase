@@ -204,6 +204,17 @@ export module Slack
 
 export module SlackFixedPhrase
 {
+    export const user_scope =
+    [
+        "users.profile:write",
+        "chat:write",
+        "channels:read",
+        "team:read",
+        "emoji:read",
+        "users:read",
+    ];
+    export const redirect_uri = "https://wraith13.github.io/slack-fixed-phrase/";
+
     export interface Application extends Slack.Application
     {
         name: string;
@@ -389,6 +400,7 @@ export module SlackFixedPhrase
                     {
                         tag: "button",
                         children: `OAuth by ${i.name} API Key`,
+                        onclick: () => Slack.authorize(i, user_scope, redirect_uri),
                     },
                 ],
             )
