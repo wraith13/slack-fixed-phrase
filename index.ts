@@ -274,19 +274,62 @@ export module SlackFixedPhrase
     };
     export module dom
     {
+        const renderIcon = (icon: Slack.Icon) =>
+        ({
+            tag: "img",
+            src:
+                icon.image_original ||
+                icon
+                [
+                    "image_" +Object.keys(icon)
+                        .filter(i => /image_\d+/.test(i))
+                        .map(i => parseInt(i.replace(/^image_/, "")))
+                        .reduce((a, b) => a < b ? b: a, 0)
+                ],
+        });
         const renderHeading = ( tag: string, text: minamo.dom.Source ) =>
         ({
             tag,
             children: text,
         });
         const renderUser = (user: Slack.User) =>
-        {
-    
-        };
+        ({
+            tag: "div",
+            className: "user",
+            children:
+            [
+                renderIcon(user.profile),
+                {
+                    tag: "span",
+                    className: "real_name",
+                    children: user.real_name
+                },
+                {
+                    tag: "span",
+                    className: "name",
+                    children: user.name
+                },
+            ],
+        });
         const renderTeam = (team: Slack.Team) =>
-        {
-    
-        };
+        ({
+            tag: "div",
+            className: "team",
+            children:
+            [
+                renderIcon(team.icon),
+                {
+                    tag: "span",
+                    className: "name",
+                    children: team.name,
+                },
+                {
+                    tag: "span",
+                    className: "domain",
+                    children: team.domain,
+                },
+            ],
+        });
         const renderIdentity = (identity: Identity)=>
         ({
             tag: "div",
