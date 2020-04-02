@@ -443,7 +443,12 @@ export module SlackFixedPhrase
                     children: "追加",
                     onclick: () =>
                     {
-                        
+                        addApplication
+                        ({
+                            name: applicationName.value,
+                            client_id: applicationClientId.value,
+                            client_secret: applicationClientSecret.value,
+                        });
                     }
                 },
             ]
