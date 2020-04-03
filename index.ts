@@ -233,9 +233,11 @@ export module SlackFixedPhrase
         api: string;
         data: unknown;
     }
-    const getApplicationList = (): Application[] => minamo.localStorage.getOrNull<Application[]>("application") ?? [];
-    const setApplicationist = (list: Application[]) => minamo.localStorage.set("application", list);
-    const addApplication = (item: Application) => setApplicationist
+    const getCurrentApplication = (): Application => minamo.localStorage.getOrNull<Application>("current-application");
+    const setCurrentApplication = (application: Application) => minamo.localStorage.set("current-application", application);
+    const getApplicationList = (): Application[] => minamo.localStorage.getOrNull<Application[]>("application-list") ?? [];
+    const setApplicationList = (list: Application[]) => minamo.localStorage.set("application-list", list);
+    const addApplication = (item: Application) => setApplicationList
     (
         [item].concat
         (
@@ -400,7 +402,11 @@ export module SlackFixedPhrase
                     {
                         tag: "button",
                         children: `OAuth by ${i.name} API Key`,
-                        onclick: () => Slack.authorize(i, user_scope, redirect_uri),
+                        onclick: () =>
+                        {
+                            setCurrentApplication(i);
+                            Slack.authorize(i, user_scope, redirect_uri);
+                        },
                     },
                 ],
             )
@@ -474,5 +480,22 @@ export module SlackFixedPhrase
             screen
         );
     }
-    export const start = async ( ) => await dom.showScreen();
+    export const start = async ( ) =>
+    {
+        const code = location.href.replace(/.*\?/, "").split("&").find(i => /^code=/.test(i))?.replace(/^code=/, "");
+        const application = getCurrentApplication();
+        if (application && code)
+        {
+            const result = await Slack.oauthV2Access(application, code, redirect_uri);
+            const token = result.authed_user.access_token;
+            addIdentity
+            ({
+                user: (await Slack.usersInfo(token, result.authed_user.id)).user,
+                team: (await Slack.teamInfo(token)).team,
+                token,
+            });
+        }
+
+        await dom.showScreen();
+    };
 }
