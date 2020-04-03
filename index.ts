@@ -455,6 +455,7 @@ export module SlackFixedPhrase
                             client_id: applicationClientId.value,
                             client_secret: applicationClientSecret.value,
                         });
+                        updateApplicationList();
                     }
                 },
             ]
@@ -495,7 +496,6 @@ export module SlackFixedPhrase
                 token,
             });
         }
-
         await dom.showScreen();
     };
 }

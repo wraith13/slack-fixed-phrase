@@ -46,37 +46,282 @@ var Slack;
     Slack.oauthV2Access = function (application, code, redirect_uri) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
         return [2 /*return*/, minamo_js_1.minamo.http.getJson("https://slack.com/api/oauth.v2.access?client_id=" + application.client_id + "&client_secret=" + application.client_secret + "&code=" + code + "&redirect_uri=" + redirect_uri)];
     }); }); };
+    Slack.usersInfo = function (token, user) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+        return [2 /*return*/, minamo_js_1.minamo.http.getJson("https://slack.com/api/users.info?token=" + token + "&user=" + user)];
+    }); }); };
     Slack.teamInfo = function (token) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
-        return [2 /*return*/, minamo_js_1.minamo.http.get("https://slack.com/api/team.info?token=" + token)];
+        return [2 /*return*/, minamo_js_1.minamo.http.getJson("https://slack.com/api/team.info?token=" + token)];
     }); }); };
     Slack.channelsList = function (token) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
-        return [2 /*return*/, minamo_js_1.minamo.http.get("https://slack.com/api/channels.list?token=" + token)];
+        return [2 /*return*/, minamo_js_1.minamo.http.getJson("https://slack.com/api/channels.list?token=" + token)];
     }); }); };
     Slack.emojiList = function (token, limit) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
-        return [2 /*return*/, minamo_js_1.minamo.http.get("https://slack.com/api/emoji.list?token=" + token + "&limit=" + limit)];
+        return [2 /*return*/, minamo_js_1.minamo.http.getJson("https://slack.com/api/emoji.list?token=" + token + "&limit=" + limit)];
     }); }); };
+    Slack.chatPostMessage = function (token, data) { return __awaiter(_this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            return [2 /*return*/, minamo_js_1.minamo.http.postJson("https://slack.com/api/chat.postMessage", JSON.stringify(data), { Authorization: "Bearer " + token })];
+        });
+    }); };
+    Slack.usersProfileSet = function (token, data) { return __awaiter(_this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            return [2 /*return*/, minamo_js_1.minamo.http.postJson("https://slack.com/api/users.profile.set", JSON.stringify(data), { Authorization: "Bearer " + token })];
+        });
+    }); };
 })(Slack = exports.Slack || (exports.Slack = {}));
 var SlackFixedPhrase;
 (function (SlackFixedPhrase) {
     var _this = this;
-    var makeHeading = function (tag, text) {
-        return ({
-            tag: tag,
-            children: text,
+    SlackFixedPhrase.user_scope = [
+        "users.profile:write",
+        "chat:write",
+        "channels:read",
+        "team:read",
+        "emoji:read",
+        "users:read",
+    ];
+    SlackFixedPhrase.redirect_uri = "https://wraith13.github.io/slack-fixed-phrase/";
+    var getCurrentApplication = function () { return minamo_js_1.minamo.localStorage.getOrNull("current-application"); };
+    var setCurrentApplication = function (application) { return minamo_js_1.minamo.localStorage.set("current-application", application); };
+    var getApplicationList = function () { var _a; return (_a = minamo_js_1.minamo.localStorage.getOrNull("application-list")) !== null && _a !== void 0 ? _a : []; };
+    var setApplicationList = function (list) { return minamo_js_1.minamo.localStorage.set("application-list", list); };
+    var addApplication = function (item) { return setApplicationList([item].concat(getApplicationList()
+        .filter(function (i) { return i.client_id !== item.client_id; }))); };
+    var getIdentityList = function () { var _a; return (_a = minamo_js_1.minamo.localStorage.getOrNull("identities")) !== null && _a !== void 0 ? _a : []; };
+    var setIdentityList = function (list) { return minamo_js_1.minamo.localStorage.set("identities", list); };
+    var addIdentity = function (item) { return setIdentityList([item].concat(getIdentityList()
+        .filter(function (i) {
+        return i.user.id !== item.user.id ||
+            i.team.id !== item.team.id;
+    }))); };
+    var getHistory = function (user) { var _a; return (_a = minamo_js_1.minamo.localStorage.getOrNull("user:" + user + ".history")) !== null && _a !== void 0 ? _a : []; };
+    var setHistory = function (user, list) { return minamo_js_1.minamo.localStorage.set("user:" + user + ".history", list); };
+    var addHistory = function (item) { return setHistory(item.user, [item].concat(getHistory(item.user)
+        .filter(function (i) { return JSON.stringify(i) !== JSON.stringify(item); }))); };
+    var getIdentity = function (id) { return getIdentityList().filter(function (i) { return i.user.id === id; })[0]; };
+    var execute = function (item) { return __awaiter(_this, void 0, void 0, function () {
+        var token, _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    token = getIdentity(item.user).token;
+                    _a = item.api;
+                    switch (_a) {
+                        case "chatPostMessage": return [3 /*break*/, 1];
+                        case "usersProfileSet": return [3 /*break*/, 3];
+                    }
+                    return [3 /*break*/, 5];
+                case 1: return [4 /*yield*/, Slack.chatPostMessage(token, item.data)];
+                case 2: return [2 /*return*/, _b.sent()];
+                case 3: return [4 /*yield*/, Slack.usersProfileSet(token, item.data)];
+                case 4: return [2 /*return*/, _b.sent()];
+                case 5:
+                    addHistory(item);
+                    return [2 /*return*/, null];
+            }
         });
-    };
-    SlackFixedPhrase.start = function () { return __awaiter(_this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            minamo_js_1.minamo.dom.appendChildren(document.body, [
-                makeHeading("h1", document.title),
+    }); };
+    var dom;
+    (function (dom) {
+        var _this = this;
+        var renderIcon = function (icon) {
+            return ({
+                tag: "img",
+                src: icon.image_original ||
+                    icon["image_" + Object.keys(icon)
+                        .filter(function (i) { return /image_\d+/.test(i); })
+                        .map(function (i) { return parseInt(i.replace(/^image_/, "")); })
+                        .reduce(function (a, b) { return a < b ? b : a; }, 0)],
+            });
+        };
+        var renderHeading = function (tag, text) {
+            return ({
+                tag: tag,
+                children: text,
+            });
+        };
+        var renderUser = function (user) {
+            return ({
+                tag: "div",
+                className: "user",
+                children: [
+                    renderIcon(user.profile),
+                    {
+                        tag: "span",
+                        className: "real_name",
+                        children: user.real_name
+                    },
+                    {
+                        tag: "span",
+                        className: "name",
+                        children: user.name
+                    },
+                ],
+            });
+        };
+        var renderTeam = function (team) {
+            return ({
+                tag: "div",
+                className: "team",
+                children: [
+                    renderIcon(team.icon),
+                    {
+                        tag: "span",
+                        className: "name",
+                        children: team.name,
+                    },
+                    {
+                        tag: "span",
+                        className: "domain",
+                        children: team.domain,
+                    },
+                ],
+            });
+        };
+        var renderIdentity = function (identity) {
+            return ({
+                tag: "div",
+                className: "identity",
+                children: [
+                    renderTeam(identity.team),
+                    renderUser(identity.user),
+                ]
+            });
+        };
+        var renderItemCore = function (item) {
+            switch (item.api) {
+                case "chatPostMessage":
+                    return JSON.stringify(item);
+                case "usersProfileSet":
+                    return JSON.stringify(item);
+            }
+            return JSON.stringify(item);
+        };
+        var renderItem = function (item) {
+            return ({
+                tag: "div",
+                className: "item",
+                children: [
+                    renderIdentity(getIdentity(item.user)),
+                    renderItemCore(item),
+                ],
+                onclick: function () { return execute(item); },
+            });
+        };
+        var identityList = minamo_js_1.minamo.dom.make(HTMLDivElement)({});
+        var updateIdentityList = function () { return minamo_js_1.minamo.dom.replaceChildren(identityList, getIdentityList().map(function (i) {
+            return [
+                renderHeading("h2", i.team.name + " / " + i.user.name),
+                renderHeading("h3", "Post Message"),
+                renderHeading("h3", "Set Status"),
+                renderHeading("h3", "History"),
+                getHistory(i.user.id).map(renderItem),
+            ];
+        })); };
+        var applicationList = minamo_js_1.minamo.dom.make(HTMLDivElement)({});
+        dom.updateApplicationList = function () { return minamo_js_1.minamo.dom.replaceChildren(applicationList, getApplicationList().map(function (i) {
+            return [
                 {
-                    tag: "a",
-                    className: "github",
-                    children: "GitHub",
-                    href: "https://github.com/wraith13/slac-fixed-phrase"
+                    tag: "button",
+                    children: "OAuth by " + i.name + " API Key",
+                    onclick: function () {
+                        setCurrentApplication(i);
+                        Slack.authorize(i, SlackFixedPhrase.user_scope, SlackFixedPhrase.redirect_uri);
+                    },
                 },
-            ]);
-            return [2 /*return*/];
+            ];
+        })); };
+        var applicationName = minamo_js_1.minamo.dom.make(HTMLInputElement)({
+            tag: "input",
+            className: "application-name",
+        });
+        var applicationClientId = minamo_js_1.minamo.dom.make(HTMLInputElement)({
+            tag: "input",
+            className: "application-client-id",
+        });
+        var applicationClientSecret = minamo_js_1.minamo.dom.make(HTMLInputElement)({
+            tag: "input",
+            className: "application-client-secret",
+        });
+        var applicationForm = minamo_js_1.minamo.dom.make(HTMLDivElement)({
+            tag: "div",
+            className: "application-form",
+            children: [
+                {
+                    tag: "label",
+                    children: ["name", applicationName,],
+                },
+                {
+                    tag: "label",
+                    children: ["client_id", applicationClientId,],
+                },
+                {
+                    tag: "label",
+                    children: ["client_secret", applicationClientSecret],
+                },
+                {
+                    tag: "button",
+                    children: "追加",
+                    onclick: function () {
+                        addApplication({
+                            name: applicationName.value,
+                            client_id: applicationClientId.value,
+                            client_secret: applicationClientSecret.value,
+                        });
+                        dom.updateApplicationList();
+                    }
+                },
+            ]
+        });
+        var screen = [
+            renderHeading("h1", document.title),
+            {
+                tag: "a",
+                className: "github",
+                children: "GitHub",
+                href: "https://github.com/wraith13/slac-fixed-phrase"
+            },
+            updateIdentityList(),
+            renderHeading("h2", "Register User"),
+            dom.updateApplicationList(),
+            renderHeading("h2", "Register API Key"),
+            applicationForm,
+        ];
+        dom.showScreen = function () { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, minamo_js_1.minamo.dom.appendChildren(document.body, screen)];
+            });
+        }); };
+    })(dom = SlackFixedPhrase.dom || (SlackFixedPhrase.dom = {}));
+    SlackFixedPhrase.start = function () { return __awaiter(_this, void 0, void 0, function () {
+        var code, application, result, token, _a, _b;
+        var _c;
+        return __generator(this, function (_d) {
+            switch (_d.label) {
+                case 0:
+                    code = (_c = location.href.replace(/.*\?/, "").split("&").find(function (i) { return /^code=/.test(i); })) === null || _c === void 0 ? void 0 : _c.replace(/^code=/, "");
+                    application = getCurrentApplication();
+                    if (!(application && code)) return [3 /*break*/, 4];
+                    return [4 /*yield*/, Slack.oauthV2Access(application, code, SlackFixedPhrase.redirect_uri)];
+                case 1:
+                    result = _d.sent();
+                    token = result.authed_user.access_token;
+                    _a = addIdentity;
+                    _b = {};
+                    return [4 /*yield*/, Slack.usersInfo(token, result.authed_user.id)];
+                case 2:
+                    _b.user = (_d.sent()).user;
+                    return [4 /*yield*/, Slack.teamInfo(token)];
+                case 3:
+                    _a.apply(void 0, [(_b.team = (_d.sent()).team,
+                            _b.token = token,
+                            _b)]);
+                    _d.label = 4;
+                case 4: return [4 /*yield*/, dom.showScreen()];
+                case 5:
+                    _d.sent();
+                    return [2 /*return*/];
+            }
         });
     }); };
 })(SlackFixedPhrase = exports.SlackFixedPhrase || (exports.SlackFixedPhrase = {}));
