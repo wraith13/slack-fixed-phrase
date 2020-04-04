@@ -214,6 +214,7 @@ export module SlackFixedPhrase
         "users:read",
     ];
     export const redirect_uri = "https://wraith13.github.io/slack-fixed-phrase/";
+    //export const redirect_uri = "http://localhost/slack-fixed-phrase/";
 
     export interface Application extends Slack.Application
     {
@@ -434,15 +435,36 @@ export module SlackFixedPhrase
             [
                 {
                     tag: "label",
-                    children: [ "name", applicationName, ],
+                    children:
+                    [
+                        {
+                            tag: "span",
+                            children: "name",
+                        },
+                        applicationName,
+                    ],
                 },
                 {
                     tag: "label",
-                    children: [ "client_id", applicationClientId, ],
+                    children:
+                    [
+                        {
+                            tag: "span",
+                            children: "client_id",
+                        },
+                        applicationClientId,
+                    ],
                 },
                 {
                     tag: "label",
-                    children: [ "client_secret", applicationClientSecret ],
+                    children:
+                    [
+                        {
+                            tag: "span",
+                            children: "client_secret",
+                        },
+                        applicationClientSecret,
+                    ],
                 },
                 {
                     tag: "button",

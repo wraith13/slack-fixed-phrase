@@ -249,15 +249,33 @@ var SlackFixedPhrase;
             children: [
                 {
                     tag: "label",
-                    children: ["name", applicationName,],
+                    children: [
+                        {
+                            tag: "span",
+                            children: "name",
+                        },
+                        applicationName,
+                    ],
                 },
                 {
                     tag: "label",
-                    children: ["client_id", applicationClientId,],
+                    children: [
+                        {
+                            tag: "span",
+                            children: "client_id",
+                        },
+                        applicationClientId,
+                    ],
                 },
                 {
                     tag: "label",
-                    children: ["client_secret", applicationClientSecret],
+                    children: [
+                        {
+                            tag: "span",
+                            children: "client_secret",
+                        },
+                        applicationClientSecret,
+                    ],
                 },
                 {
                     tag: "button",
