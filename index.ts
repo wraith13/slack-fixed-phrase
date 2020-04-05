@@ -36,8 +36,6 @@ export module Slack
         image_230?: string;
         image_512?: string;
         image_original?: string;
-
-
     }
     export interface Team
     {
@@ -113,7 +111,6 @@ export module Slack
         updated: UnixTime;
         has_2fa: boolean;
     }
-
     export const authorize =
     (
         application: Application,
@@ -201,7 +198,6 @@ export module Slack
             { Authorization: `Bearer ${token}` }
         );
 }
-
 export module SlackFixedPhrase
 {
     export const user_scope =
@@ -215,19 +211,16 @@ export module SlackFixedPhrase
     ];
     export const redirect_uri = "https://wraith13.github.io/slack-fixed-phrase/";
     //export const redirect_uri = "http://localhost/slack-fixed-phrase/";
-
     export interface Application extends Slack.Application
     {
         name: string;
     }
-
     export interface Identity
     {
         user: Slack.User;
         team: Slack.Team;
         token: Slack.AccessToken;
     }
-
     export interface HistoryItem
     {
         user: Slack.UserId;
