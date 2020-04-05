@@ -231,14 +231,8 @@ export module SlackFixedPhrase
     const setCurrentApplication = (application: Application) => minamo.localStorage.set("current-application", application);
     const getApplicationList = (): Application[] => minamo.localStorage.getOrNull<Application[]>("application-list") ?? [];
     const setApplicationList = (list: Application[]) => minamo.localStorage.set("application-list", list);
-    const addApplication = (item: Application) => setApplicationList
-    (
-        [item].concat
-        (
-            getApplicationList()
-                .filter(i => i.client_id !== item.client_id)
-        )
-    );
+    const addApplication = (item: Application) => setApplicationList([item].concat(removeApplication(item)));
+    const removeApplication = (item: Application) => setApplicationList(getApplicationList().filter(i => i.name !== item.name || i.client_id !== item.client_id || i.client_secret !== item.client_secret));
     const getIdentityList = (): Identity[] => minamo.localStorage.getOrNull<Identity[]>("identities") ?? [];
     const setIdentityList = (list: Identity[]) => minamo.localStorage.set("identities", list);
     const addIdentity = (item: Identity) => setIdentityList
@@ -394,14 +388,33 @@ export module SlackFixedPhrase
                 i =>
                 [
                     {
-                        tag: "button",
-                        children: `OAuth by ${i.name} API Key`,
-                        onclick: () =>
-                        {
-                            setCurrentApplication(i);
-                            Slack.authorize(i, user_scope, redirect_uri);
-                        },
-                    },
+                        tag: "div",
+                        children:
+                        [
+                            {
+                                tag: "button",
+                                children: `OAuth by ${i.name} API Key`,
+                                onclick: () =>
+                                {
+                                    setCurrentApplication(i);
+                                    Slack.authorize(i, user_scope, redirect_uri);
+                                },
+                            },
+                            {
+                                tag: "button",
+                                className: "sub",
+                                children: `…`,
+                                onclick: () =>
+                                {
+                                    if (window.confirm("🗑 Remove this application?"))
+                                    {
+                                        removeApplication(i);
+                                        updateApplicationList();
+                                    }
+                                },
+                            },
+                        ]
+                    }
                 ],
             )
         );

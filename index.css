@@ -55,10 +55,11 @@ button {
   font-size: 1rem;
   cursor: pointer;
 }
-button:hover {
+button.sub {
   color: #228844;
   background-color: #FFFFFF;
   border-color: #228844;
+  padding: 4px 8px;
 }
 .application-form button {
   margin-left: calc(8em + 4px);

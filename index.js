@@ -85,8 +85,8 @@ var SlackFixedPhrase;
     var setCurrentApplication = function (application) { return minamo_js_1.minamo.localStorage.set("current-application", application); };
     var getApplicationList = function () { var _a; return (_a = minamo_js_1.minamo.localStorage.getOrNull("application-list")) !== null && _a !== void 0 ? _a : []; };
     var setApplicationList = function (list) { return minamo_js_1.minamo.localStorage.set("application-list", list); };
-    var addApplication = function (item) { return setApplicationList([item].concat(getApplicationList()
-        .filter(function (i) { return i.client_id !== item.client_id; }))); };
+    var addApplication = function (item) { return setApplicationList([item].concat(removeApplication(item))); };
+    var removeApplication = function (item) { return setApplicationList(getApplicationList().filter(function (i) { return i.name !== item.name || i.client_id !== item.client_id || i.client_secret !== item.client_secret; })); };
     var getIdentityList = function () { var _a; return (_a = minamo_js_1.minamo.localStorage.getOrNull("identities")) !== null && _a !== void 0 ? _a : []; };
     var setIdentityList = function (list) { return minamo_js_1.minamo.localStorage.set("identities", list); };
     var addIdentity = function (item) { return setIdentityList([item].concat(getIdentityList()
@@ -222,13 +222,29 @@ var SlackFixedPhrase;
         dom.updateApplicationList = function () { return minamo_js_1.minamo.dom.replaceChildren(applicationList, getApplicationList().map(function (i) {
             return [
                 {
-                    tag: "button",
-                    children: "OAuth by " + i.name + " API Key",
-                    onclick: function () {
-                        setCurrentApplication(i);
-                        Slack.authorize(i, SlackFixedPhrase.user_scope, SlackFixedPhrase.redirect_uri);
-                    },
-                },
+                    tag: "div",
+                    children: [
+                        {
+                            tag: "button",
+                            children: "OAuth by " + i.name + " API Key",
+                            onclick: function () {
+                                setCurrentApplication(i);
+                                Slack.authorize(i, SlackFixedPhrase.user_scope, SlackFixedPhrase.redirect_uri);
+                            },
+                        },
+                        {
+                            tag: "button",
+                            className: "sub",
+                            children: "\u2026",
+                            onclick: function () {
+                                if (window.confirm("🗑 Remove this application?")) {
+                                    removeApplication(i);
+                                    dom.updateApplicationList();
+                                }
+                            },
+                        },
+                    ]
+                }
             ];
         })); };
         var applicationName = minamo_js_1.minamo.dom.make(HTMLInputElement)({
