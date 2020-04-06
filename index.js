@@ -89,11 +89,8 @@ var SlackFixedPhrase;
     var removeApplication = function (item) { return setApplicationList(getApplicationList().filter(function (i) { return i.name !== item.name || i.client_id !== item.client_id || i.client_secret !== item.client_secret; })); };
     var getIdentityList = function () { var _a; return (_a = minamo_js_1.minamo.localStorage.getOrNull("identities")) !== null && _a !== void 0 ? _a : []; };
     var setIdentityList = function (list) { return minamo_js_1.minamo.localStorage.set("identities", list); };
-    var addIdentity = function (item) { return setIdentityList([item].concat(getIdentityList()
-        .filter(function (i) {
-        return i.user.id !== item.user.id ||
-            i.team.id !== item.team.id;
-    }))); };
+    var addIdentity = function (item) { return setIdentityList([item].concat(removeIdentity(item))); };
+    var removeIdentity = function (item) { return setIdentityList(getIdentityList().filter(function (i) { return i.user.id !== item.user.id || i.team.id !== item.team.id; })); };
     var getHistory = function (user) { var _a; return (_a = minamo_js_1.minamo.localStorage.getOrNull("user:" + user + ".history")) !== null && _a !== void 0 ? _a : []; };
     var setHistory = function (user, list) { return minamo_js_1.minamo.localStorage.set("user:" + user + ".history", list); };
     var addHistory = function (item) { return setHistory(item.user, [item].concat(getHistory(item.user)
@@ -211,7 +208,20 @@ var SlackFixedPhrase;
         var identityList = minamo_js_1.minamo.dom.make(HTMLDivElement)({});
         var updateIdentityList = function () { return minamo_js_1.minamo.dom.replaceChildren(identityList, getIdentityList().map(function (i) {
             return [
-                renderHeading("h2", i.team.name + " / " + i.user.name),
+                renderHeading("h2", [
+                    i.team.name + " / " + i.user.name,
+                    {
+                        tag: "button",
+                        className: "sub",
+                        children: "\u2026",
+                        onclick: function () {
+                            if (window.confirm("🗑 Remove this user?")) {
+                                removeIdentity(i);
+                                updateIdentityList();
+                            }
+                        },
+                    }
+                ]),
                 renderHeading("h3", "Post Message"),
                 renderHeading("h3", "Set Status"),
                 renderHeading("h3", "History"),

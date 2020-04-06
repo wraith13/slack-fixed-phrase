@@ -235,19 +235,8 @@ export module SlackFixedPhrase
     const removeApplication = (item: Application) => setApplicationList(getApplicationList().filter(i => i.name !== item.name || i.client_id !== item.client_id || i.client_secret !== item.client_secret));
     const getIdentityList = (): Identity[] => minamo.localStorage.getOrNull<Identity[]>("identities") ?? [];
     const setIdentityList = (list: Identity[]) => minamo.localStorage.set("identities", list);
-    const addIdentity = (item: Identity) => setIdentityList
-    (
-        [item].concat
-        (
-            getIdentityList()
-                .filter
-                (
-                    i =>
-                        i.user.id !== item.user.id ||
-                        i.team.id !== item.team.id
-                )
-        )
-    );
+    const addIdentity = (item: Identity) => setIdentityList([item].concat(removeIdentity(item)));
+    const removeIdentity = (item: Identity) => setIdentityList(getIdentityList().filter(i => i.user.id !== item.user.id || i.team.id !== item.team.id));
     const getHistory = (user: Slack.UserId): HistoryItem[] => minamo.localStorage.getOrNull<HistoryItem[]>(`user:${user}.history`) ?? [];
     const setHistory = (user: Slack.UserId, list: HistoryItem[]) => minamo.localStorage.set(`user:${user}.history`, list);
     const addHistory = (item: HistoryItem) => setHistory
@@ -371,7 +360,26 @@ export module SlackFixedPhrase
             (
                 i =>
                 [
-                    renderHeading ( "h2", `${i.team.name} / ${i.user.name}` ),
+                    renderHeading
+                    (
+                        "h2",
+                        [
+                            `${i.team.name} / ${i.user.name}`,
+                            {
+                                tag: "button",
+                                className: "sub",
+                                children: `…`,
+                                onclick: () =>
+                                {
+                                    if (window.confirm("🗑 Remove this user?"))
+                                    {
+                                        removeIdentity(i);
+                                        updateIdentityList();
+                                    }
+                                },
+                            }
+                        ]
+                    ),
                     renderHeading ( "h3", "Post Message" ),
                     renderHeading ( "h3", "Set Status" ),
                     renderHeading ( "h3", "History" ),
