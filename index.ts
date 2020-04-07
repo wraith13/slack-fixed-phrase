@@ -364,7 +364,7 @@ export module SlackFixedPhrase
                     (
                         "h2",
                         [
-                            `${i.team.name} / ${i.user.name}`,
+                            renderIdentity(i),
                             {
                                 tag: "button",
                                 className: "sub",

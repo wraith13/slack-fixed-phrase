@@ -209,7 +209,7 @@ var SlackFixedPhrase;
         var updateIdentityList = function () { return minamo_js_1.minamo.dom.replaceChildren(identityList, getIdentityList().map(function (i) {
             return [
                 renderHeading("h2", [
-                    i.team.name + " / " + i.user.name,
+                    renderIdentity(i),
                     {
                         tag: "button",
                         className: "sub",

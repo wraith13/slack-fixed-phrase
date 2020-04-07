@@ -13,6 +13,30 @@ h1 {
   color: #FFFFFF;
   background-color: #000022;
 }
+h2 {
+  display: inline-flex;
+  align-items: center;
+}
+h2 div.identity {
+  display: inline-flex;
+  align-items: center;
+}
+h2 div.identity div {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 8px;
+}
+h2 div.identity div * {
+  margin-right: 8px;
+}
+h2 div.identity div img {
+  height: 32px;
+  width: 32px;
+  border-radius: 4px;
+}
+h2 div.identity div span + span {
+  color: #888;
+}
 .github {
   float: right;
   margin-top: 1rem;
