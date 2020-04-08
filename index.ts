@@ -209,8 +209,7 @@ export module SlackFixedPhrase
         "emoji:read",
         "users:read",
     ];
-    export const redirect_uri = "https://wraith13.github.io/slack-fixed-phrase/";
-    //export const redirect_uri = "http://localhost/slack-fixed-phrase/";
+    export const redirect_uri = location.href.replace(/\?.*/, "");
     export interface Application extends Slack.Application
     {
         name: string;
@@ -353,7 +352,7 @@ export module SlackFixedPhrase
             onclick: () => execute(item),
         });
         const identityList = minamo.dom.make(HTMLDivElement)({ });
-        const updateIdentityList = () => minamo.dom.replaceChildren
+        export const updateIdentityList = () => minamo.dom.replaceChildren
         (
             identityList,
             getIdentityList().map
@@ -492,6 +491,9 @@ export module SlackFixedPhrase
                             client_secret: applicationClientSecret.value,
                         });
                         updateApplicationList();
+                        applicationName.value = "";
+                        applicationClientId.value = "";
+                        applicationClientSecret.value = "";
                     }
                 },
             ]
@@ -531,6 +533,8 @@ export module SlackFixedPhrase
                 team: (await Slack.teamInfo(token)).team,
                 token,
             });
+            dom.updateIdentityList();
+            history.replaceState(null, document.title, redirect_uri);
         }
         await dom.showScreen();
     };

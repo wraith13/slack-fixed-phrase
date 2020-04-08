@@ -17,10 +17,6 @@ h2 {
   display: inline-flex;
   align-items: center;
 }
-h2 div.identity {
-  display: inline-flex;
-  align-items: center;
-}
 h2 div.identity div {
   display: inline-flex;
   align-items: center;

@@ -80,7 +80,7 @@ var SlackFixedPhrase;
         "emoji:read",
         "users:read",
     ];
-    SlackFixedPhrase.redirect_uri = "https://wraith13.github.io/slack-fixed-phrase/";
+    SlackFixedPhrase.redirect_uri = location.href.replace(/\?.*/, "");
     var getCurrentApplication = function () { return minamo_js_1.minamo.localStorage.getOrNull("current-application"); };
     var setCurrentApplication = function (application) { return minamo_js_1.minamo.localStorage.set("current-application", application); };
     var getApplicationList = function () { var _a; return (_a = minamo_js_1.minamo.localStorage.getOrNull("application-list")) !== null && _a !== void 0 ? _a : []; };
@@ -206,7 +206,7 @@ var SlackFixedPhrase;
             });
         };
         var identityList = minamo_js_1.minamo.dom.make(HTMLDivElement)({});
-        var updateIdentityList = function () { return minamo_js_1.minamo.dom.replaceChildren(identityList, getIdentityList().map(function (i) {
+        dom.updateIdentityList = function () { return minamo_js_1.minamo.dom.replaceChildren(identityList, getIdentityList().map(function (i) {
             return [
                 renderHeading("h2", [
                     renderIdentity(i),
@@ -217,7 +217,7 @@ var SlackFixedPhrase;
                         onclick: function () {
                             if (window.confirm("🗑 Remove this user?")) {
                                 removeIdentity(i);
-                                updateIdentityList();
+                                dom.updateIdentityList();
                             }
                         },
                     }
@@ -313,6 +313,9 @@ var SlackFixedPhrase;
                             client_secret: applicationClientSecret.value,
                         });
                         dom.updateApplicationList();
+                        applicationName.value = "";
+                        applicationClientId.value = "";
+                        applicationClientSecret.value = "";
                     }
                 },
             ]
@@ -325,7 +328,7 @@ var SlackFixedPhrase;
                 children: "GitHub",
                 href: "https://github.com/wraith13/slac-fixed-phrase"
             },
-            updateIdentityList(),
+            dom.updateIdentityList(),
             renderHeading("h2", "Register User"),
             dom.updateApplicationList(),
             renderHeading("h2", "Register API Key"),
@@ -360,6 +363,8 @@ var SlackFixedPhrase;
                     _a.apply(void 0, [(_b.team = (_d.sent()).team,
                             _b.token = token,
                             _b)]);
+                    dom.updateIdentityList();
+                    history.replaceState(null, document.title, SlackFixedPhrase.redirect_uri);
                     _d.label = 4;
                 case 4: return [4 /*yield*/, dom.showScreen()];
                 case 5:
