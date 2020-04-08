@@ -319,7 +319,7 @@ export module SlackFixedPhrase
                 },
             ],
         });
-        const renderIdentity = (identity: Identity)=>
+        const renderIdentity = (identity: Identity) =>
         ({
             tag: "div",
             className: "identity",
@@ -329,7 +329,7 @@ export module SlackFixedPhrase
                 renderUser(identity.user),
             ]
         });
-        const renderItemCore = (item: HistoryItem)=>
+        const renderItemCore = (item: HistoryItem) =>
         {
             switch(item.api)
             {
@@ -340,7 +340,7 @@ export module SlackFixedPhrase
             }
             return JSON.stringify(item);
         };
-        const renderItem = (item: HistoryItem)=>
+        const renderItem = (item: HistoryItem) =>
         ({
             tag: "div",
             className: "item",
@@ -349,8 +349,147 @@ export module SlackFixedPhrase
                 renderIdentity(getIdentity(item.user)),
                 renderItemCore(item),
             ],
-            onclick: () => execute(item),
+            onclick: async () =>
+            {
+                await execute(item);
+                addHistory(item);
+                updateIdentityList();
+            },
         });
+        const renderPostMessageForm = (identity: Identity) =>
+        {
+            const channel = minamo.dom.make(HTMLInputElement)
+            ({
+                tag: "input",
+                className: "post-message-channel",
+            });
+            const text = minamo.dom.make(HTMLInputElement)
+            ({
+                tag: "input",
+                className: "post-message-text",
+            });
+            return minamo.dom.make(HTMLDivElement)
+            ({
+                tag: "div",
+                className: "application-form",
+                children:
+                [
+                    {
+                        tag: "label",
+                        children:
+                        [
+                            {
+                                tag: "span",
+                                children: "channel",
+                            },
+                            channel,
+                        ],
+                    },
+                    {
+                        tag: "label",
+                        children:
+                        [
+                            {
+                                tag: "span",
+                                children: "text",
+                            },
+                            text,
+                        ],
+                    },
+                    {
+                        tag: "button",
+                        children: "投稿",
+                        onclick: async () =>
+                        {
+                            const item =
+                            {
+                                user: identity.user.id,
+                                api: "chatPostMessage",
+                                data: { channel: channel.value, text: text.value},
+                            };
+                            await execute(item);
+                            addHistory(item);
+                            updateIdentityList();
+                        }
+                    },
+                ]
+            });
+        };
+        const renderSetStatusForm = (identity: Identity) =>
+        {
+            const status_emoji = minamo.dom.make(HTMLInputElement)
+            ({
+                tag: "input",
+                className: "application-name",
+            });
+            const status_text = minamo.dom.make(HTMLInputElement)
+            ({
+                tag: "input",
+                className: "application-client-id",
+            });
+            const status_expiration = minamo.dom.make(HTMLInputElement)
+            ({
+                tag: "input",
+                className: "application-client-secret",
+            });
+            return minamo.dom.make(HTMLDivElement)
+            ({
+                tag: "div",
+                className: "application-form",
+                children:
+                [
+                    {
+                        tag: "label",
+                        children:
+                        [
+                            {
+                                tag: "span",
+                                children: "emoji",
+                            },
+                            status_emoji,
+                        ],
+                    },
+                    {
+                        tag: "label",
+                        children:
+                        [
+                            {
+                                tag: "span",
+                                children: "text",
+                            },
+                            status_text,
+                        ],
+                    },
+                    {
+                        tag: "label",
+                        children:
+                        [
+                            {
+                                tag: "span",
+                                children: "expiration",
+                            },
+                            status_expiration,
+                        ],
+                    },
+                    {
+                        tag: "button",
+                        children: "適用",
+                        onclick: async () =>
+                        {
+                            const item =
+                            {
+                                user: identity.user.id,
+                                api: "usersProfileSet",
+                                data: { status_emoji: status_emoji.value, status_text: status_text.value, status_expiration: parseInt(status_expiration.value)},
+                            };
+                            await execute(item);
+                            addHistory(item);
+                            updateIdentityList();
+                        }
+                    },
+                ]
+            });
+        };
         const identityList = minamo.dom.make(HTMLDivElement)({ });
         export const updateIdentityList = () => minamo.dom.replaceChildren
         (
@@ -380,7 +519,9 @@ export module SlackFixedPhrase
                         ]
                     ),
                     renderHeading ( "h3", "Post Message" ),
+                    renderPostMessageForm(i),
                     renderHeading ( "h3", "Set Status" ),
+                    renderSetStatusForm(i),
                     renderHeading ( "h3", "History" ),
                     getHistory(i.user.id).map(renderItem),
                 ],

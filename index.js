@@ -202,7 +202,150 @@ var SlackFixedPhrase;
                     renderIdentity(getIdentity(item.user)),
                     renderItemCore(item),
                 ],
-                onclick: function () { return execute(item); },
+                onclick: function () { return __awaiter(_this, void 0, void 0, function () {
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0: return [4 /*yield*/, execute(item)];
+                            case 1:
+                                _a.sent();
+                                addHistory(item);
+                                dom.updateIdentityList();
+                                return [2 /*return*/];
+                        }
+                    });
+                }); },
+            });
+        };
+        var renderPostMessageForm = function (identity) {
+            var channel = minamo_js_1.minamo.dom.make(HTMLInputElement)({
+                tag: "input",
+                className: "post-message-channel",
+            });
+            var text = minamo_js_1.minamo.dom.make(HTMLInputElement)({
+                tag: "input",
+                className: "post-message-text",
+            });
+            return minamo_js_1.minamo.dom.make(HTMLDivElement)({
+                tag: "div",
+                className: "application-form",
+                children: [
+                    {
+                        tag: "label",
+                        children: [
+                            {
+                                tag: "span",
+                                children: "channel",
+                            },
+                            channel,
+                        ],
+                    },
+                    {
+                        tag: "label",
+                        children: [
+                            {
+                                tag: "span",
+                                children: "text",
+                            },
+                            text,
+                        ],
+                    },
+                    {
+                        tag: "button",
+                        children: "投稿",
+                        onclick: function () { return __awaiter(_this, void 0, void 0, function () {
+                            var item;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0:
+                                        item = {
+                                            user: identity.user.id,
+                                            api: "chatPostMessage",
+                                            data: { channel: channel.value, text: text.value },
+                                        };
+                                        return [4 /*yield*/, execute(item)];
+                                    case 1:
+                                        _a.sent();
+                                        addHistory(item);
+                                        dom.updateIdentityList();
+                                        return [2 /*return*/];
+                                }
+                            });
+                        }); }
+                    },
+                ]
+            });
+        };
+        var renderSetStatusForm = function (identity) {
+            var status_emoji = minamo_js_1.minamo.dom.make(HTMLInputElement)({
+                tag: "input",
+                className: "application-name",
+            });
+            var status_text = minamo_js_1.minamo.dom.make(HTMLInputElement)({
+                tag: "input",
+                className: "application-client-id",
+            });
+            var status_expiration = minamo_js_1.minamo.dom.make(HTMLInputElement)({
+                tag: "input",
+                className: "application-client-secret",
+            });
+            return minamo_js_1.minamo.dom.make(HTMLDivElement)({
+                tag: "div",
+                className: "application-form",
+                children: [
+                    {
+                        tag: "label",
+                        children: [
+                            {
+                                tag: "span",
+                                children: "emoji",
+                            },
+                            status_emoji,
+                        ],
+                    },
+                    {
+                        tag: "label",
+                        children: [
+                            {
+                                tag: "span",
+                                children: "text",
+                            },
+                            status_text,
+                        ],
+                    },
+                    {
+                        tag: "label",
+                        children: [
+                            {
+                                tag: "span",
+                                children: "expiration",
+                            },
+                            status_expiration,
+                        ],
+                    },
+                    {
+                        tag: "button",
+                        children: "適用",
+                        onclick: function () { return __awaiter(_this, void 0, void 0, function () {
+                            var item;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0:
+                                        item = {
+                                            user: identity.user.id,
+                                            api: "usersProfileSet",
+                                            data: { status_emoji: status_emoji.value, status_text: status_text.value, status_expiration: parseInt(status_expiration.value) },
+                                        };
+                                        return [4 /*yield*/, execute(item)];
+                                    case 1:
+                                        _a.sent();
+                                        addHistory(item);
+                                        dom.updateIdentityList();
+                                        return [2 /*return*/];
+                                }
+                            });
+                        }); }
+                    },
+                ]
             });
         };
         var identityList = minamo_js_1.minamo.dom.make(HTMLDivElement)({});
@@ -223,7 +366,9 @@ var SlackFixedPhrase;
                     }
                 ]),
                 renderHeading("h3", "Post Message"),
+                renderPostMessageForm(i),
                 renderHeading("h3", "Set Status"),
+                renderSetStatusForm(i),
                 renderHeading("h3", "History"),
                 getHistory(i.user.id).map(renderItem),
             ];
