@@ -352,7 +352,6 @@ export module SlackFixedPhrase
             onclick: async () =>
             {
                 await execute(item);
-                addHistory(item);
                 updateIdentityList();
             },
         });
@@ -401,14 +400,12 @@ export module SlackFixedPhrase
                         children: "投稿",
                         onclick: async () =>
                         {
-                            const item =
-                            {
+                            await execute
+                            ({
                                 user: identity.user.id,
                                 api: "chatPostMessage",
                                 data: { channel: channel.value, text: text.value},
-                            };
-                            await execute(item);
-                            addHistory(item);
+                            });
                             updateIdentityList();
                         }
                     },
@@ -652,6 +649,40 @@ export module SlackFixedPhrase
             renderHeading ( "h2", `Register User` ),
             updateApplicationList(),
             renderHeading ( "h2", `Register API Key` ),
+            renderHeading ( "h3", `Requirement` ),
+            {
+                tag: "dl",
+                children:
+                [
+                    {
+                        tag: "dt",
+                        children: "Redirect URLs",
+                    },
+                    {
+                        tag: "dd",
+                        children: redirect_uri,
+                    },
+                    {
+                        tag: "dt",
+                        children: "User Token Scopes",
+                    },
+                    {
+                        tag: "dd",
+                        children:
+                        {
+                            tag: "ul",
+                            children: user_scope.map
+                            (
+                                i =>
+                                ({
+                                    tag: "li",
+                                    children: i
+                                })
+                            )
+                        }
+                    },
+                ],
+            },
             applicationForm,
         ];
         export const showScreen = async ( ) => minamo.dom.appendChildren

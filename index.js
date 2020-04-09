@@ -208,7 +208,6 @@ var SlackFixedPhrase;
                             case 0: return [4 /*yield*/, execute(item)];
                             case 1:
                                 _a.sent();
-                                addHistory(item);
                                 dom.updateIdentityList();
                                 return [2 /*return*/];
                         }
@@ -253,19 +252,15 @@ var SlackFixedPhrase;
                         tag: "button",
                         children: "投稿",
                         onclick: function () { return __awaiter(_this, void 0, void 0, function () {
-                            var item;
                             return __generator(this, function (_a) {
                                 switch (_a.label) {
-                                    case 0:
-                                        item = {
+                                    case 0: return [4 /*yield*/, execute({
                                             user: identity.user.id,
                                             api: "chatPostMessage",
                                             data: { channel: channel.value, text: text.value },
-                                        };
-                                        return [4 /*yield*/, execute(item)];
+                                        })];
                                     case 1:
                                         _a.sent();
-                                        addHistory(item);
                                         dom.updateIdentityList();
                                         return [2 /*return*/];
                                 }
@@ -477,6 +472,36 @@ var SlackFixedPhrase;
             renderHeading("h2", "Register User"),
             dom.updateApplicationList(),
             renderHeading("h2", "Register API Key"),
+            renderHeading("h3", "Requirement"),
+            {
+                tag: "dl",
+                children: [
+                    {
+                        tag: "dt",
+                        children: "Redirect URLs",
+                    },
+                    {
+                        tag: "dd",
+                        children: SlackFixedPhrase.redirect_uri,
+                    },
+                    {
+                        tag: "dt",
+                        children: "User Token Scopes",
+                    },
+                    {
+                        tag: "dd",
+                        children: {
+                            tag: "ul",
+                            children: SlackFixedPhrase.user_scope.map(function (i) {
+                                return ({
+                                    tag: "li",
+                                    children: i
+                                });
+                            })
+                        }
+                    },
+                ],
+            },
             applicationForm,
         ];
         dom.showScreen = function () { return __awaiter(_this, void 0, void 0, function () {
