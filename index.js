@@ -250,7 +250,7 @@ var SlackFixedPhrase;
                     },
                     {
                         tag: "button",
-                        children: "投稿",
+                        children: "Post",
                         onclick: function () { return __awaiter(_this, void 0, void 0, function () {
                             return __generator(this, function (_a) {
                                 switch (_a.label) {
@@ -319,7 +319,7 @@ var SlackFixedPhrase;
                     },
                     {
                         tag: "button",
-                        children: "適用",
+                        children: "Apply",
                         onclick: function () { return __awaiter(_this, void 0, void 0, function () {
                             var item;
                             return __generator(this, function (_a) {
@@ -445,7 +445,7 @@ var SlackFixedPhrase;
                 },
                 {
                     tag: "button",
-                    children: "追加",
+                    children: "Add",
                     onclick: function () {
                         addApplication({
                             name: applicationName.value,

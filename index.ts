@@ -397,7 +397,7 @@ export module SlackFixedPhrase
                     },
                     {
                         tag: "button",
-                        children: "投稿",
+                        children: "Post",
                         onclick: async () =>
                         {
                             await execute
@@ -470,7 +470,7 @@ export module SlackFixedPhrase
                     },
                     {
                         tag: "button",
-                        children: "適用",
+                        children: "Apply",
                         onclick: async () =>
                         {
                             const item =
@@ -619,7 +619,7 @@ export module SlackFixedPhrase
                 },
                 {
                     tag: "button",
-                    children: "追加",
+                    children: "Add",
                     onclick: () =>
                     {
                         addApplication
