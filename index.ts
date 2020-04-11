@@ -473,14 +473,17 @@ export module SlackFixedPhrase
                         children: "Apply",
                         onclick: async () =>
                         {
-                            const item =
-                            {
+                            await execute
+                            ({
                                 user: identity.user.id,
                                 api: "usersProfileSet",
-                                data: { status_emoji: status_emoji.value, status_text: status_text.value, status_expiration: parseInt(status_expiration.value)},
-                            };
-                            await execute(item);
-                            addHistory(item);
+                                data:
+                                {
+                                    status_emoji: status_emoji.value,
+                                    status_text: status_text.value,
+                                    status_expiration: parseInt(status_expiration.value),
+                                },
+                            });
                             updateIdentityList();
                         }
                     },

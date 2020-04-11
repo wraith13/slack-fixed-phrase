@@ -321,19 +321,19 @@ var SlackFixedPhrase;
                         tag: "button",
                         children: "Apply",
                         onclick: function () { return __awaiter(_this, void 0, void 0, function () {
-                            var item;
                             return __generator(this, function (_a) {
                                 switch (_a.label) {
-                                    case 0:
-                                        item = {
+                                    case 0: return [4 /*yield*/, execute({
                                             user: identity.user.id,
                                             api: "usersProfileSet",
-                                            data: { status_emoji: status_emoji.value, status_text: status_text.value, status_expiration: parseInt(status_expiration.value) },
-                                        };
-                                        return [4 /*yield*/, execute(item)];
+                                            data: {
+                                                status_emoji: status_emoji.value,
+                                                status_text: status_text.value,
+                                                status_expiration: parseInt(status_expiration.value),
+                                            },
+                                        })];
                                     case 1:
                                         _a.sent();
-                                        addHistory(item);
                                         dom.updateIdentityList();
                                         return [2 /*return*/];
                                 }
